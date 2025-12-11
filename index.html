@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Locker - AykolinoApps</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+    
+    <style>
+        /* Globale Stile & Animationen */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #f5f5f5;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+
+        .glow-effect {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0) 60%);
+            animation: rotateGlow 15s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes rotateGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Header Stile */
+        .header {
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header-scrolled {
+            background-color: rgba(10, 10, 10, 0.7);
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sprachauswahl Stile */
+        .lang-switcher-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background-color: #111827;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            width: 160px;
+            z-index: 60;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0.2s;
+        }
+
+        .lang-switcher-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Drag & Drop Zone Styles */
+        .drop-active {
+            border-color: #3b82f6 !important;
+            background-color: rgba(59, 130, 246, 0.1) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hintergrund Glow -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div class="glow-effect"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="main-header" class="header fixed top-0 left-0 w-full z-50 backdrop-blur-md border-b border-transparent transition-colors duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <a href="https://aykolino.de" class="text-2xl font-bold tracking-tight text-white">
+                    Aykolino<span class="gradient-text">Apps</span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="https://uebermich.aykolino.de" class="text-gray-300 hover:text-white transition-colors">Über mich</a>
+                    <a href="mailto:ayko.tiedtke2@yahoo.de" class="text-gray-300 hover:text-white transition-colors">Kontakt</a>
+                    
+                    <!-- Sprachauswahl -->
+                    <div class="relative lang-switcher">
+                        <button id="lang-switcher-button" class="flex items-center text-gray-300 hover:text-white transition-colors">
+                            <img src="https://flagcdn.com/w40/de.png" alt="DE" class="w-5 h-auto mr-2 rounded-sm object-cover">
+                            <span>DE</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        </button>
+                        <div id="lang-switcher-dropdown" class="lang-switcher-dropdown p-2 space-y-1">
+                            <a href="#" class="flex items-center w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-700 rounded-md transition-colors">
+                                <img src="https://flagcdn.com/w40/de.png" class="w-5 h-auto mr-3 rounded-sm"> Deutsch
+                            </a>
+                            <a href="#" class="flex items-center w-full px-3 py-2 text-sm text-gray-200 hover:bg-gray-700 rounded-md transition-colors">
+                                <img src="https://flagcdn.com/w40/gb.png" class="w-5 h-auto mr-3 rounded-sm"> English
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-gray-800">
+            <a href="https://uebermich.aykolino.de" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-800">Über mich</a>
+            <a href="mailto:ayko.tiedtke2@yahoo.de" class="block py-3 px-4 text-sm text-gray-200 hover:bg-gray-800">Kontakt</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-32 pb-10 px-4">
+        
+        <div class="w-full max-w-2xl mx-auto">
+            <!-- Tool Card -->
+            <div class="bg-slate-800 rounded-xl shadow-2xl p-8 border border-slate-700 relative overflow-hidden">
+                
+                <!-- Titel Bereich -->
+                <div class="text-center mb-8 relative z-10">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">HTML Locker 🔒</h1>
+                    <p class="text-slate-400">Verschlüssele HTML-Dateien client-seitig & sicher.</p>
+                </div>
+
+                <!-- Step 1: File Input -->
+                <div id="drop-zone" class="relative z-10 border-2 border-dashed border-slate-600 rounded-lg p-10 text-center cursor-pointer transition-all duration-300 hover:border-blue-500 hover:bg-slate-700 group bg-slate-900/50">
+                    <input type="file" id="file-input" accept=".html,.htm" class="hidden">
+                    <div class="pointer-events-none">
+                        <svg class="w-12 h-12 mx-auto text-slate-500 mb-4 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        <p class="text-lg font-medium text-slate-300 group-hover:text-white">HTML-Datei hier ablegen</p>
+                        <p class="text-sm text-slate-500 mt-1">oder klicken zum Auswählen</p>
+                    </div>
+                    <p id="file-name" class="mt-4 text-blue-400 font-semibold hidden"></p>
+                </div>
+
+                <!-- Step 2: Password -->
+                <div class="mt-6 relative z-10">
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Passwort setzen</label>
+                    <input type="password" id="password" placeholder="Sicheres Passwort eingeben..." class="w-full px-4 py-3 bg-slate-900 border border-slate-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-slate-500">
+                </div>
+
+                <!-- Step 3: Action -->
+                <button id="encrypt-btn" class="relative z-10 w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-[1.02] shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Datei Verschlüsseln & Herunterladen
+                </button>
+
+                <div id="status-msg" class="mt-4 text-center text-sm font-medium hidden"></div>
+            </div>
+
+            <!-- Innerer Footer (Außerhalb der Card, aber zentriert darunter) -->
+            <footer class="mt-6 text-slate-500 text-sm flex justify-between items-center px-2">
+                <div>Version 1.0</div>
+                <div>©AykolinoApps</div>
+            </footer>
+        </div>
+
+    </main>
+
+    <!-- Haupt Footer -->
+    <footer class="text-center py-10 mt-20 border-t border-gray-800">
+        <p class="text-gray-500">
+            © <span id="year"></span> AykolinoApps. Mit Leidenschaft.
+        </p>
+        <p class="text-xs text-gray-600 mt-2">
+            Diese Domain wird nicht für gewerbliche Zwecke genutzt.
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // --- UI Logic (Header, Mobile Menu) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Year update
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            // Mobile Menu Toggle
+            const mobileBtn = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(mobileBtn && mobileMenu) {
+                mobileBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // Lang Switcher Toggle
+            const langBtn = document.getElementById('lang-switcher-button');
+            const langDropdown = document.getElementById('lang-switcher-dropdown');
+            if(langBtn && langDropdown) {
+                langBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    langDropdown.classList.toggle('open');
+                });
+                window.addEventListener('click', () => {
+                    langDropdown.classList.remove('open');
+                });
+            }
+
+            // Header Scroll Effect
+            const header = document.getElementById('main-header');
+            window.addEventListener('scroll', () => {
+                if(window.scrollY > 10) {
+                    header.classList.add('header-scrolled');
+                } else {
+                    header.classList.remove('header-scrolled');
+                }
+            });
+        });
+
+        // --- ENCRYPTION TOOL LOGIC ---
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileNameDisplay = document.getElementById('file-name');
+        const passwordInput = document.getElementById('password');
+        const encryptBtn = document.getElementById('encrypt-btn');
+        const statusMsg = document.getElementById('status-msg');
+
+        let selectedFile = null;
+
+        // --- Event Listeners for Drag & Drop ---
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drop-active');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drop-active');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drop-active');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (file.type !== 'text/html' && !file.name.endsWith('.html') && !file.name.endsWith('.htm')) {
+                showStatus('Bitte nur HTML Dateien auswählen.', 'text-red-400');
+                return;
+            }
+            selectedFile = file;
+            fileNameDisplay.textContent = `Ausgewählt: ${file.name}`;
+            fileNameDisplay.classList.remove('hidden');
+            showStatus('', ''); // Clear error if any
+        }
+
+        // --- Encryption Logic ---
+
+        encryptBtn.addEventListener('click', async () => {
+            const password = passwordInput.value;
+            if (!selectedFile) {
+                showStatus('Bitte wähle zuerst eine Datei aus.', 'text-red-400');
+                return;
+            }
+            if (!password) {
+                showStatus('Bitte gib ein Passwort ein.', 'text-red-400');
+                return;
+            }
+
+            encryptBtn.disabled = true;
+            const originalBtnText = encryptBtn.innerHTML;
+            encryptBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Verarbeite...
+            `;
+
+            try {
+                const fileContent = await readFile(selectedFile);
+                const encryptedData = await encryptContent(fileContent, password);
+                const finalHTML = generateSelfDecryptingHTML(encryptedData);
+                
+                downloadFile(finalHTML, `locked_${selectedFile.name}`);
+                
+                showStatus('Erfolg! Datei wurde heruntergeladen.', 'text-green-400');
+                passwordInput.value = '';
+            } catch (err) {
+                console.error(err);
+                showStatus('Fehler beim Verschlüsseln.', 'text-red-400');
+            } finally {
+                encryptBtn.disabled = false;
+                encryptBtn.innerHTML = originalBtnText;
+            }
+        });
+
+        function showStatus(msg, colorClass) {
+            statusMsg.textContent = msg;
+            statusMsg.className = `mt-4 text-center text-sm font-medium ${colorClass}`;
+            statusMsg.classList.remove('hidden');
+        }
+
+        function readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsText(file);
+            });
+        }
+
+        function downloadFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // --- Crypto Functions ---
+
+        async function encryptContent(plainText, password) {
+            const enc = new TextEncoder();
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+
+            const keyMaterial = await window.crypto.subtle.importKey(
+                "raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
+            );
+
+            const key = await window.crypto.subtle.deriveKey(
+                { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+                keyMaterial,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["encrypt"]
+            );
+
+            const encryptedBuffer = await window.crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv },
+                key,
+                enc.encode(plainText)
+            );
+
+            return {
+                salt: bufferToBase64(salt),
+                iv: bufferToBase64(iv),
+                data: bufferToBase64(new Uint8Array(encryptedBuffer))
+            };
+        }
+
+        function bufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        // --- Template Generator (Resulting Locked File) ---
+        function generateSelfDecryptingHTML(payload) {
+            return `<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geschütztes Dokument</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #111827; color: #f3f4f6; display: flex; height: 100vh; align-items: center; justify-content: center; margin: 0; }
+        .container { background: #1f2937; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border: 1px solid #374151; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #4b5563; background: #374151; color: white; border-radius: 6px; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: #3b82f6; ring: 2px solid #3b82f6; }
+        button { background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; transition: background 0.2s; }
+        button:hover { background: #1d4ed8; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .error { color: #f87171; margin-top: 10px; display: none; font-size: 14px; }
+        .icon { font-size: 40px; margin-bottom: 10px; }
+        h2 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div class="container" id="login-box">
+        <div class="icon">🔒</div>
+        <h2>Geschützter Inhalt</h2>
+        <p style="color: #9ca3af; font-size: 14px; margin-bottom: 20px;">Dieses Dokument ist verschlüsselt. Bitte Passwort eingeben.</p>
+        <form id="decrypt-form">
+            <input type="password" id="pass" placeholder="Passwort..." autofocus required>
+            <button type="submit" id="btn">Entsperren</button>
+            <div id="error-msg" class="error">Falsches Passwort oder beschädigte Datei.</div>
+        </form>
+    </div>
+
+    <script>
+        const payload = ${JSON.stringify(payload)};
+
+        document.getElementById('decrypt-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('pass').value;
+            const btn = document.getElementById('btn');
+            const errorMsg = document.getElementById('error-msg');
+            
+            btn.innerText = 'Entschlüssele...';
+            btn.disabled = true;
+            errorMsg.style.display = 'none';
+
+            try {
+                const dec = new TextDecoder();
+                const salt = base64ToBuffer(payload.salt);
+                const iv = base64ToBuffer(payload.iv);
+                const data = base64ToBuffer(payload.data);
+
+                const keyMaterial = await window.crypto.subtle.importKey(
+                    "raw", new TextEncoder().encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
+                );
+
+                const key = await window.crypto.subtle.deriveKey(
+                    { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+                    keyMaterial,
+                    { name: "AES-GCM", length: 256 },
+                    false,
+                    ["decrypt"]
+                );
+
+                const decryptedBuffer = await window.crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: iv },
+                    key,
+                    data
+                );
+
+                const decryptedHTML = dec.decode(decryptedBuffer);
+                
+                document.open();
+                document.write(decryptedHTML);
+                document.close();
+
+            } catch (err) {
+                console.error(err);
+                btn.innerText = 'Entsperren';
+                btn.disabled = false;
+                errorMsg.style.display = 'block';
+                document.getElementById('pass').value = '';
+            }
+        });
+
+        function base64ToBuffer(base64) {
+            const binary = window.atob(base64);
+            const len = binary.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes;
+        }
+    <\/script>
+</body>
+</html>`;
+        }
+    </script>
+</body>
+</html>
